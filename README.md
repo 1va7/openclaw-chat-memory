@@ -167,4 +167,7 @@ MIT License
 
 ## 作者
 
-VA7 - [小红书](https://www.xiaohongshu.com/user/profile/5bfd693851783a4917f40d5a) | [公众号：异璧辑](https://mp.weixin.qq.com/)
+VA7
+- 小红书 & 抖音：VA7
+- 视频号：VA7-AI创业版
+- 公众号：异璧辑
