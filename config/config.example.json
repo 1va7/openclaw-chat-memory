@@ -1,0 +1,22 @@
+{
+  "feishu": {
+    "appId": "YOUR_FEISHU_APP_ID",
+    "appSecret": "YOUR_FEISHU_APP_SECRET",
+    "comment": "Get these from https://open.feishu.cn/app"
+  },
+  "workspace": {
+    "chatsDir": "~/.openclaw/workspace/chats",
+    "comment": "Where to store chat archives and project memories"
+  },
+  "refresh": {
+    "messageThreshold": 50,
+    "daysThreshold": 7,
+    "comment": "Trigger refresh when >50 new messages or >7 days since last update"
+  },
+  "analysis": {
+    "projectKeywords": {
+      "example-project": ["keyword1", "keyword2"],
+      "comment": "Define keywords for each project to improve analysis accuracy"
+    }
+  }
+}
