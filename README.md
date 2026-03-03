@@ -1,92 +1,82 @@
 # OpenClaw Chat Memory Manager
 
-> 一套完整的群聊记忆管理和项目管理系统，让 OpenClaw agent 拥有持久化的项目记忆
+> 群聊记忆管理系统，让 OpenClaw agent 记住项目信息
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
-[![OpenClaw](https://img.shields.io/badge/OpenClaw-%3E%3D2026.2-blue)](https://openclaw.ai/)
 
-## ✨ 特性
+## 这是什么
 
-- 🗂️ **自动导出和存档群聊历史** - 支持飞书、Telegram、Discord 等平台
-- 🧠 **智能分析项目和任务** - 自动识别项目、目标、任务、决策
-- 📝 **生成结构化的工作记忆文档** - 清晰展示项目状态和进展
-- 🔍 **高效搜索历史对话** - 一步到位，不需要多轮推理
-- 🔄 **自动刷新保持记忆最新** - 定时检测新消息并更新记忆
+OpenClaw agent 的 session 重启后会忘记之前的对话。这个工具把群聊记录存到文件里，让 agent 能随时查看项目历史。
 
-## 🎯 解决的问题
+**支持平台**：飞书（Feishu）
 
-### 问题1：Agent 记忆丢失
-**现象**：Session 重启后，agent 忘记之前的对话和项目信息
+## 核心功能
 
-**解决**：将聊天记录和项目信息持久化到文件系统，不依赖 session context
+- **导出群聊记录** - 把飞书群聊存成 JSONL 文件
+- **分析项目信息** - 从聊天记录中提取项目目标、任务、决策
+- **生成工作记忆** - 为每个项目创建 README.md，记录关键信息
+- **快速搜索** - 按时间和关键词搜索历史对话
+- **自动刷新** - 定时检查新消息并更新记忆
 
-### 问题2：多轮推理浪费算力
-**现象**：每次搜索历史都需要 8+ 轮推理，消耗 50k+ tokens
+## 解决的问题
 
-**解决**：提供高效的搜索 skill，一步到位返回结构化结果，**效率提升 10 倍**
+### 1. Agent 记忆丢失
+Session 重启后，agent 忘记之前的对话。
 
-### 问题3：项目信息碎片化
-**现象**：项目信息散落在各个 session 中，难以追溯
+**解决方法**：把聊天记录存到文件，agent 可以随时读取。
 
-**解决**：为每个项目创建独立的工作记忆文档，记录目标、任务、决策
+### 2. 搜索效率低
+每次搜索历史需要多轮推理，浪费 tokens。
 
-### 问题4：跨 Session 协作困难
-**现象**：不同 agent 无法共享 context，重复工作
+**解决方法**：提供搜索脚本，一次返回结果。实测效率提升 10 倍（从 8 轮推理降到 1 轮）。
 
-**解决**：建立共享的项目记忆库，所有 agent 都能访问
+### 3. 项目信息碎片化
+项目信息散落在各个对话中，难以追溯。
 
-## 📦 安装
+**解决方法**：为每个项目创建独立的工作记忆文档，记录目标、任务、决策。
 
-### 方式1：通过 ClawHub（推荐）
+## 安装
+
+### 前置要求
+
+- Node.js >= 18.0.0
+- OpenClaw Gateway 已安装
+- 飞书应用凭证（App ID 和 App Secret）
+
+### 安装步骤
 
 ```bash
-clawhub install chat-memory-manager
-```
-
-### 方式2：从 GitHub 克隆
-
-```bash
-git clone https://github.com/va7/openclaw-chat-memory.git
+# 1. 克隆仓库
+git clone https://github.com/1va7/openclaw-chat-memory.git
 cd openclaw-chat-memory
-./tools/install.sh
-```
 
-### 方式3：手动安装
-
-```bash
-# 1. 复制脚本
+# 2. 复制脚本
 cp scripts/*.mjs ~/.openclaw/workspace/scripts/
 
-# 2. 复制 skill
+# 3. 复制 skill
 cp -r skills/chat-history-search ~/.openclaw/workspace/skills/
 
-# 3. 配置
+# 4. 配置飞书凭证
 cp config/config.example.json ~/.openclaw/workspace/config.json
-# 编辑 config.json 填入飞书凭证
+# 编辑 config.json 填入飞书 App ID 和 App Secret
 
-# 4. 重启 gateway
+# 5. 重启 gateway
 openclaw gateway restart
 ```
 
-## 🚀 快速开始
+### 获取飞书凭证
 
-### 1. 配置飞书凭证
+1. 访问 https://open.feishu.cn/app
+2. 创建企业自建应用
+3. 获取 App ID 和 App Secret
+4. 添加权限：
+   - `im:message:read_all` - 读取消息
+   - `im:chat:read` - 读取群信息
 
-编辑 `~/.openclaw/workspace/config.json`：
+## 使用方法
 
-```json
-{
-  "feishu": {
-    "appId": "YOUR_APP_ID",
-    "appSecret": "YOUR_APP_SECRET"
-  }
-}
-```
-
-获取凭证：https://open.feishu.cn/app
-
-### 2. 导出群聊历史
+### 1. 导出群聊历史
 
 ```bash
 node ~/.openclaw/workspace/scripts/export-chat-history.mjs \
@@ -94,138 +84,87 @@ node ~/.openclaw/workspace/scripts/export-chat-history.mjs \
   --output=~/.openclaw/workspace/chats/oc_xxx/archive/messages.jsonl
 ```
 
-### 3. 分析项目
+### 2. 分析项目
 
 ```bash
 node ~/.openclaw/workspace/scripts/deep-analyze-project.mjs \
   --chat-id=oc_xxx \
-  --project=your-project-name
+  --project-name=my-project \
+  --keywords="关键词1,关键词2"
 ```
 
-### 4. 搜索历史
+生成文件：
+- `chats/oc_xxx/projects/my-project/deep-analysis.json` - 分析数据
+- `chats/oc_xxx/projects/my-project/README.md` - 工作记忆文档
+
+### 3. 搜索历史对话
 
 ```bash
 node ~/.openclaw/workspace/scripts/search-chat-history.mjs \
   --chat-id=oc_xxx \
-  --after="2026-03-01" \
-  --keyword="任务"
+  --keyword="搜索词" \
+  --start-date=2026-03-01 \
+  --end-date=2026-03-03
 ```
 
-### 5. 设置自动刷新
+或在 OpenClaw 中使用 `chat-history-search` skill。
 
-在 OpenClaw 中创建 cron 任务：
+### 4. 自动刷新
 
-```javascript
-{
-  "name": "刷新群聊记忆",
-  "schedule": { "kind": "cron", "expr": "0 23 * * *" },
-  "payload": {
-    "kind": "systemEvent",
-    "text": "执行群聊记忆刷新"
-  },
-  "sessionTarget": "main",
-  "enabled": true
-}
-```
-
-## 📚 文档
-
-- [安装指南](INSTALL.md) - 详细的安装步骤
-- [使用文档](USAGE.md) - 完整的使用指南
-- [架构设计](docs/architecture.md) - 系统架构和设计思路
-- [API 文档](docs/api.md) - 脚本 API 参考
-- [故障排查](docs/troubleshooting.md) - 常见问题解决
-- [最佳实践](docs/best-practices.md) - 使用建议
-
-## 🏗️ 架构
-
-```
-chats/
-  {chat_id}/
-    context.yaml          # 群聊上下文（成员、目标、规则）
-    archive/
-      messages.jsonl      # 聊天记录存档
-      chat_info.json      # 群信息
-    analysis.json         # 群聊分析报告
-    projects/
-      {project_name}/
-        README.md         # 项目工作记忆
-        deep-analysis.json # 深度分析数据
-```
-
-## 🎬 演示
-
-### 效率对比
-
-| 方面 | 传统方式 | 使用本系统 |
-|------|---------|-----------|
-| 推理轮数 | 8轮 | 1轮 |
-| Token消耗 | ~50k | ~5k |
-| 时间 | 需要多次尝试 | 直接返回 |
-| 输出 | 需要手动解析 | 结构化JSON |
-
-### 实际案例
-
-**场景**：Agent 需要搜索群聊中关于"任务"的讨论
-
-**传统方式**（8轮推理，52k tokens）：
-1. 尝试从 session history 查找 → 失败
-2. 意识到需要去 archive/messages.jsonl
-3. 用 grep 统计消息数量
-4. 用 jq 提取消息内容
-5. 找到相关消息
-6. 手动解析 JSON
-7. 格式化输出
-8. 返回结果
-
-**使用本系统**（1轮，5k tokens）：
-```bash
-node scripts/search-chat-history.mjs \
-  --chat-id=oc_xxx \
-  --keyword="任务" \
-  --limit=5
-```
-
-直接返回结构化结果！
-
-## 🤝 贡献
-
-欢迎贡献！请阅读 [贡献指南](CONTRIBUTING.md)
-
-### 开发
+设置 cron 任务，每天自动检查新消息并更新记忆：
 
 ```bash
-# 克隆仓库
-git clone https://github.com/va7/openclaw-chat-memory.git
-cd openclaw-chat-memory
-
-# 安装依赖（如果有）
-npm install
-
-# 运行测试
-npm test
-
-# 提交 PR
-git checkout -b feature/your-feature
-git commit -m "Add your feature"
-git push origin feature/your-feature
+node ~/.openclaw/workspace/scripts/refresh-chat-memory.mjs
 ```
 
-## 📝 许可证
+## 文件结构
 
-[MIT License](LICENSE)
+```
+~/.openclaw/workspace/
+├── chats/
+│   └── {chat_id}/
+│       ├── context.yaml          # 群聊上下文
+│       ├── analysis.json         # 群聊分析
+│       ├── archive/
+│       │   └── messages.jsonl    # 聊天记录
+│       └── projects/
+│           └── {project_name}/
+│               ├── README.md     # 工作记忆
+│               └── deep-analysis.json
+├── scripts/
+│   ├── export-chat-history.mjs
+│   ├── deep-analyze-project.mjs
+│   ├── search-chat-history.mjs
+│   └── refresh-chat-memory.mjs
+└── skills/
+    └── chat-history-search/
+        ├── SKILL.md
+        └── scripts/
+            └── search-chat-history.mjs
+```
 
-## 🙏 致谢
+## 常见问题
 
-- [OpenClaw](https://openclaw.ai/) - 强大的 AI agent 框架
-- [飞书开放平台](https://open.feishu.cn/) - 提供 API 支持
+### 1. 找不到飞书群 ID
 
-## 📧 联系
+在飞书群中发送消息，查看 OpenClaw 日志中的 `chat_id`。
 
-- GitHub Issues: [提交问题](https://github.com/va7/openclaw-chat-memory/issues)
-- Discord: [加入社区](https://discord.com/invite/clawd)
-- Twitter: [@va7](https://twitter.com/va7)
+### 2. 权限不足
 
----
+确保飞书应用已添加必要权限并发布到企业。
 
-**Made with ❤️ by VA7**
+### 3. 搜索结果为空
+
+检查时间范围和关键词是否正确，确认 messages.jsonl 文件存在。
+
+## 贡献
+
+欢迎提交 issue 和 PR。
+
+## 许可证
+
+MIT License
+
+## 作者
+
+VA7 - [小红书](https://www.xiaohongshu.com/user/profile/5bfd693851783a4917f40d5a) | [公众号：异璧辑](https://mp.weixin.qq.com/)
