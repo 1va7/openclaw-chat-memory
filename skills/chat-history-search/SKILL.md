@@ -46,7 +46,7 @@ node scripts/search-chat-history.mjs \
 {
   "total": 45,
   "chat_id": "oc_xxx",
-  "chat_name": "顶尖KOL春卷版🎣",
+  "chat_name": "示例群聊",
   "time_range": {
     "start": "2026-03-03 08:00:00",
     "end": "2026-03-03 20:00:00"
@@ -56,7 +56,7 @@ node scripts/search-chat-history.mjs \
       "timestamp": "2026-03-03 12:31:54",
       "timestamp_ms": 1772507114579,
       "sender": "ou_4f0c5425526c97a3e1c3923b8ac8496b",
-      "sender_name": "CC",
+      "sender_name": "用户A",
       "content": "设置一个定时任务，每天早上8点...",
       "message_id": "om_xxx"
     }
@@ -78,7 +78,7 @@ node scripts/search-chat-history.mjs \
 
 ### 示例对比
 
-**之前（蛋扣的方式）**:
+**之前（手动方式）**:
 ```bash
 # 第1步：统计消息数
 grep '"timestamp":"17725' messages.jsonl | wc -l
@@ -94,7 +94,7 @@ grep '"timestamp":"17725' messages.jsonl | tail -20 | jq -r '...'
 ```bash
 # 一步到位
 node scripts/search-chat-history.mjs \
-  --chat-id=oc_d8679c627381dd05154718a26696dce3 \
+  --chat-id=oc_xxx \
   --after="2026-03-03 08:00"
 ```
 
